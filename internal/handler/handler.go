@@ -1,90 +1,54 @@
-// Package handler is the presentation layer, contains everything related to the layer that will be exposed to the end user (in this case an HTTP Client)
+// Package handler is the presentation layer, contains everything needed to trigger the behavior of the program, both synchronous and asynchronous
 package handler
 
 import (
-	"encoding/json"
-	"fmt"
-	"github.com/yael-castro/layered-architecture/internal/model"
-	"log"
-	"net/http"
+	"github.com/gin-gonic/gin"
 )
 
-// Configuration are the settings for initialize an instance of Handler
-type Configuration struct {
-	// NotFound handle requests made to non exist paths
-	NotFound http.Handler
-	// HealthCheck handle requests made to know the path
-	HealthCheck http.Handler
-	// MethodNotAllowed handle requests made to existing paths but with wrong method
-	MethodNotAllowed http.Handler
+// Handler defines the main handler that contains all *gin.HandlerFunc
+type Handler interface {
+	ProductManager
+	HealthCheck(*gin.Context)
 }
 
-// New builds an instance of *Handler using the Configuration
-func New(config Configuration) *Handler {
-	h := &Handler{
-		NotFound:         config.NotFound,
-		MethodNotAllowed: config.MethodNotAllowed,
-	}
+// _ "implements" constraint for GinHandlers
+var _ Handler = GinHandlers{}
 
-	h.handlers = make(map[string]map[string]http.Handler)
-
-	h.SetHandler("/", http.MethodGet, config.HealthCheck)
-
-	return h
+// GinHandlers is the collection of all *gin.HandlerFunc used to initialize the *gin.Engine
+//
+// In resume is the configuration to initialize the *gin.Engine
+type GinHandlers struct {
+	ProductManager
+	healthCheck gin.HandlerFunc
 }
 
-// Handler contains all instances of http.Handler to setting the endpoints
-type Handler struct {
-	NotFound         http.Handler
-	MethodNotAllowed http.Handler
-	handlers         map[string]map[string]http.Handler
+// SetHealthCheck sets the gin.HandlerFunc that is used as health check handler
+func (g *GinHandlers) SetHealthCheck(healthCheck gin.HandlerFunc) {
+	g.healthCheck = healthCheck
 }
 
-// SetHandler configure a Handler to path and method
-func (h *Handler) SetHandler(path, method string, handler http.Handler) {
-	_, ok := h.handlers[path]
-	if !ok {
-		h.handlers[path] = make(map[string]http.Handler)
-	}
-
-	h.handlers[path][method] = handler
+// HealthCheck is the default *gin.HandlerFunc to know and monitoring the server status
+func (g GinHandlers) HealthCheck(c *gin.Context) {
+	g.healthCheck(c)
 }
 
-// ServeHTTP handle every
-func (h Handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	path := r.URL.Path
-
-	log.Println(path)
-
-	methods, ok := h.handlers[path]
-	if !ok {
-		h.NotFound.ServeHTTP(w, r)
-		return
-	}
-
-	handler, ok := methods[r.Method]
-	if !ok {
-		h.MethodNotAllowed.ServeHTTP(w, r)
-		return
-	}
-
-	handler.ServeHTTP(w, r)
+// HealthCheck is the default *gin.HandlerFunc used to know the health server and monitoring the server status
+func HealthCheck(c *gin.Context) {
+	c.Writer.Write(nil)
 }
 
-// NotFound default http.Handler to handle requests made to no exists path
-func NotFound(w http.ResponseWriter, r *http.Request) {
-	JSON(w, http.StatusOK, model.Map{"message": fmt.Sprintf(`path '%s' does not exists`, r.URL.Path)})
-}
+// NewGinEngine using an instance of Handler initializes the *gin.Engine
+func NewGinEngine(h Handler) *gin.Engine {
+	engine := gin.Default()
 
-// HealthCheck default http.Handler to make a health check status
-func HealthCheck(w http.ResponseWriter, r *http.Request) {
-	w.Write(nil)
-}
+	engine.GET("/", h.HealthCheck)
 
-// JSON sends the data encoded in JSON format via HTTP
-func JSON(w http.ResponseWriter, status int, data any) error {
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(status)
+	engine.POST("/products-api/v1/products/", h.CreateProduct)
 
-	return json.NewEncoder(w).Encode(data)
+	engine.GET("/products-api/v1/products/", h.ObtainProducts)
+	engine.GET("/products-api/v1/products/:id", h.ObtainProduct)
+
+	engine.DELETE("/products-api/v1/products/", h.DeleteProduct)
+
+	return engine
 }

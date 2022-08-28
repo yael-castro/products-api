@@ -4,8 +4,8 @@ package dependency
 import (
 	"database/sql"
 	"fmt"
-	"github.com/yael-castro/layered-architecture/internal/handler"
-	"net/http"
+	"github.com/gin-gonic/gin"
+	"github.com/yael-castro/agrak/internal/handler"
 )
 
 // Singleton instances
@@ -53,18 +53,18 @@ func NewInjector(p Profile) Injector {
 	panic(fmt.Sprintf(`invalid profile: "%d" is not supported`, p))
 }
 
-// handlerDefault InjectorFunc for *handler.Handler that uses a Default Profile
+// handlerDefault InjectorFunc for *handler.GinHandlers that uses a Default Profile
 func handlerDefault(a any) error {
-	h, ok := a.(*handler.Handler)
+	engine, ok := a.(*gin.Engine)
 	if !ok {
-		return fmt.Errorf(`an instance of "%T" is required not "%T"`, h, a)
+		return fmt.Errorf(`an instance of "%T" is required not "%T"`, engine, a)
 	}
 
-	config := handler.Configuration{
-		NotFound:    http.HandlerFunc(handler.NotFound),
-		HealthCheck: http.HandlerFunc(handler.HealthCheck),
-	}
+	handlers := handler.GinHandlers{}
 
-	*h = *handler.New(config)
+	handlers.SetHealthCheck(handler.HealthCheck)
+	handlers.ProductManager = handler.ProductStore{}
+
+	*engine = *handler.NewGinEngine(handlers)
 	return nil
 }
