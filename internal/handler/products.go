@@ -10,6 +10,8 @@ type ProductManager interface {
 	CreateProduct(*gin.Context)
 	// ObtainProduct handle http requests to search a product from the storage
 	ObtainProduct(*gin.Context)
+	// UpdateProduct handle http requests to update a product from the storage
+	UpdateProduct(*gin.Context)
 	// DeleteProduct handle http requests to remove a product from the storage
 	DeleteProduct(*gin.Context)
 	// ObtainProducts handle http requests to list products
@@ -28,6 +30,11 @@ func (p ProductStore) CreateProduct(c *gin.Context) {
 }
 
 func (p ProductStore) ObtainProduct(c *gin.Context) {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (p ProductStore) UpdateProduct(c *gin.Context) {
 	//TODO implement me
 	panic("implement me")
 }

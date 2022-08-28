@@ -48,6 +48,8 @@ func NewGinEngine(h Handler) *gin.Engine {
 	engine.GET("/products-api/v1/products/", h.ObtainProducts)
 	engine.GET("/products-api/v1/products/:id", h.ObtainProduct)
 
+	engine.PUT("/products-api/v1/products/:id", h.UpdateProduct)
+
 	engine.DELETE("/products-api/v1/products/", h.DeleteProduct)
 
 	return engine
