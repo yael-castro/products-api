@@ -1,16 +1,13 @@
-// Package model contains data transfer objects, domain objects, error, enumerations and any data types used across all packages
 package model
 
 import (
 	"database/sql"
 	"database/sql/driver"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/url"
 )
-
-// Map used to make unique structures
-type Map map[string]interface{}
 
 // "implement" constraints for URL and *URL
 var _ fmt.Stringer = URL{}
@@ -50,7 +47,17 @@ func (u *URL) MarshalJSON() ([]byte, error) {
 
 // UnmarshalJSON decodes the string value into *url.URL
 func (u *URL) UnmarshalJSON(bytes []byte) (err error) {
-	u.URL, err = url.Parse(string(bytes[1 : len(bytes)-1]))
+	rawURL := string(bytes)
+
+	if len(bytes) < 2 {
+		return errors.New("malformed url")
+	}
+
+	if rawURL[0] == '"' && rawURL[len(rawURL)-1] == '"' {
+		rawURL = rawURL[1 : len(rawURL)-1]
+	}
+
+	u.URL, err = url.Parse(rawURL)
 	return
 }
 
