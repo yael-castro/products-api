@@ -6,11 +6,11 @@ type StorageManager[K comparable, V any] interface {
 	// Create saves a new record into the storage
 	Create(*V) error
 	// Obtain returns the record identified by K from the store
-	Obtain(K) (K, V)
+	Obtain(K) (V, error)
 	// Update updates a record identified by K
 	Update(K, V) error
 	// Delete removes a record identified by K from the store
 	Delete(K) error
 	// List returns all records into the store
-	List() error
+	List() ([]V, error)
 }
