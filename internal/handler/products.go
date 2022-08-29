@@ -7,20 +7,6 @@ import (
 	"net/http"
 )
 
-// ProductManager defines the *gin.HandlerFunc group to manage the http requests related to product management
-type ProductManager interface {
-	// CreateProduct handle http requests to add a new product to the storage
-	CreateProduct(*gin.Context)
-	// ObtainProduct handle http requests to search a product from the storage
-	ObtainProduct(*gin.Context)
-	// UpdateProduct handle http requests to update a product from the storage
-	UpdateProduct(*gin.Context)
-	// DeleteProduct handle http requests to remove a product from the storage
-	DeleteProduct(*gin.Context)
-	// ObtainProducts handle http requests to list products
-	ObtainProducts(*gin.Context)
-}
-
 // _ "implements" constraint for ProductStore
 var _ ProductManager = ProductStore{}
 
@@ -33,7 +19,7 @@ func (p ProductStore) CreateProduct(c *gin.Context) {
 
 	err := c.Bind(&product)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
+		handleError(c, err)
 		return
 	}
 
@@ -63,7 +49,7 @@ func (p ProductStore) UpdateProduct(c *gin.Context) {
 
 	err := c.Bind(&product)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
+		c.JSON(http.StatusUnprocessableEntity, gin.H{"message": err.Error()})
 		return
 	}
 

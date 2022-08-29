@@ -16,7 +16,7 @@ type (
 		// Brand name of the brand
 		Brand string `json:"brand" gorm:"type:varchar;not null"`
 		// Size product size
-		Size *string `json:"size" gorm:"type:varchar;not null"`
+		Size *string `json:"size" gorm:"type:varchar"`
 		// Price sell price
 		Price float64 `json:"price" gorm:"type:decimal;not null"`
 		// PrincipalImage URL of the principal image of the product, which is used in catalogs

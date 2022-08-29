@@ -15,26 +15,32 @@ type StorageManager[K comparable, V any] interface {
 	List() ([]V, error)
 }
 
+// MockStorage simulates data persistence to test some features more easy, also can be used as a memory repository
 type MockStorage[K comparable, V any] map[K]V
 
+// Create missing implementation
 func (m *MockStorage[K, V]) Create(v *V) error {
 	return nil
 }
 
+// Obtain returns the record associate to the key received as parameter
 func (m MockStorage[K, V]) Obtain(k K) (V, error) {
 	return m[k], nil
 }
 
+// Update replaces the record associate to the key received as parameter
 func (m *MockStorage[K, V]) Update(k K, v V) error {
 	(*m)[k] = v
 	return nil
 }
 
+// Delete removes the record associate to the key received as parameter
 func (m *MockStorage[K, V]) Delete(k K) error {
 	delete(*m, k)
 	return nil
 }
 
+// List returns all records from the hash map
 func (m MockStorage[K, V]) List() ([]V, error) {
 	list := make([]V, 0)
 

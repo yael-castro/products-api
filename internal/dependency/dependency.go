@@ -2,7 +2,6 @@
 package dependency
 
 import (
-	"database/sql"
 	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
@@ -10,12 +9,6 @@ import (
 	"github.com/yael-castro/agrak/internal/handler"
 	"github.com/yael-castro/agrak/internal/repository"
 	"os"
-)
-
-// Singleton instances
-var (
-	// DB instance of connection to SQL storage
-	DB *sql.DB
 )
 
 // Profile defines options of dependency injection
@@ -43,7 +36,7 @@ func (f InjectorFunc) Inject(a any) error {
 	return f(a)
 }
 
-// NewInjector is an abstract factory to Injector, it builds a instance of Injector interface based on the Profile based as parameter
+// NewInjector is an abstract factory to Injector, it builds an instance of Injector interface based on the Profile based as parameter
 //
 // Supported profiles: Default and Testing
 //
@@ -76,7 +69,6 @@ func handlerDefault(a any) error {
 
 	handlers := handler.GinHandlers{}
 
-	handlers.SetHealthCheck(handler.HealthCheck)
 	handlers.ProductManager = handler.ProductStore{
 		ProductManager: business.ProductStore{
 			StorageManager: repository.ProductStore{

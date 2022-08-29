@@ -4,9 +4,9 @@ import (
 	"database/sql"
 	"database/sql/driver"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"net/url"
+	"strings"
 )
 
 // "implement" constraints for URL and *URL
@@ -49,11 +49,7 @@ func (u *URL) MarshalJSON() ([]byte, error) {
 func (u *URL) UnmarshalJSON(bytes []byte) (err error) {
 	rawURL := string(bytes)
 
-	if len(bytes) < 2 {
-		return errors.New("malformed url")
-	}
-
-	if rawURL[0] == '"' && rawURL[len(rawURL)-1] == '"' {
+	if strings.HasPrefix(rawURL, `"`) && strings.HasSuffix(rawURL, `"`) {
 		rawURL = rawURL[1 : len(rawURL)-1]
 	}
 
@@ -66,7 +62,6 @@ func (u URL) String() string {
 	if u.URL == nil {
 		return ""
 	}
-
 	return u.URL.String()
 }
 
