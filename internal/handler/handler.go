@@ -57,14 +57,14 @@ func NewGinEngine(h Handler) *gin.Engine {
 	engine.NoRoute(NotFound)
 	engine.GET("/", HealthCheck)
 
-	engine.POST("/products-api/v1/products/", h.CreateProduct)
+	engine.POST("/v1/products/", h.CreateProduct)
 
-	engine.GET("/products-api/v1/products/", h.ObtainProducts)
-	engine.GET("/products-api/v1/products/:id", h.ObtainProduct)
+	engine.GET("/v1/products/", h.ObtainProducts)
+	engine.GET("/v1/products/:id", h.ObtainProduct)
 
-	engine.PUT("/products-api/v1/products/:id", h.UpdateProduct)
+	engine.PUT("/v1/products/:id", h.UpdateProduct)
 
-	engine.DELETE("/products-api/v1/products/", h.DeleteProduct)
+	engine.DELETE("/v1/products/", h.DeleteProduct)
 
 	return engine
 }

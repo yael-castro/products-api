@@ -3,7 +3,7 @@
 REST API for product storage management
 ###### Quick Links
 - [Required environment variables](.env.example)
-- [Swagger documentation](swagger.yml)
+- [API documentation](https://documenter.getpostman.com/view/12474312/VUxLvTJR)
 
 ###### How to run (Golang)
 ```shell
