@@ -62,9 +62,9 @@ func NewGinEngine(h Handler) *gin.Engine {
 	engine.GET("/v1/products/", h.ObtainProducts)
 	engine.GET("/v1/products/:id", h.ObtainProduct)
 
-	engine.PUT("/v1/products/:id", h.UpdateProduct)
+	engine.PUT("/v1/products/", h.UpdateProduct)
 
-	engine.DELETE("/v1/products/", h.DeleteProduct)
+	engine.DELETE("/v1/products/:id", h.DeleteProduct)
 
 	return engine
 }
