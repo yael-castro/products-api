@@ -1,78 +1,67 @@
-# Layered architecture pattern in Golang
-[![Icon](./docs/images/banner.png)](https://github.com/yael-castro)
+# Products RESTful API - Coding evaluation
 
-This is a project template for Golang that uses the layered architecture pattern
+REST API for product storage management
+###### Quick Links
+- [Required environment variables](.env.example)
+- [Swagger documentation](swagger.yml)
 
-
-❌ IMPORTANT ❌
-
-- The following information was recapitulated from the book [Learning Domain-Driven Design, Vlad Khononov](https://www.oreilly.com/library/view/learning-domain-driven-design/9781098100124/)
-- It is very important to read this document completely to understand the architecture pattern
+###### How to run (Golang)
+```shell
+# Load required environment variables
+export $(grep -v ^# .env.example)
+# Run SQL migrations
+go run ./cmd/migrations/migrations.go
+# Run HTTP server
+go run ./cmd/server/server.go
+```
 
 ###### Architecture style explained
+The architecture pattern used in this project is the most common form of layered architecture pattern 
+with three layers (presentation, business, and data access) and some additional changes about
+communication between layers, due to architecture decisions (explained below 👇🏼)
+
 ```
-internal
-├── business    (business logic layer)
-├── dependency  (manage dependencies)
-├── handler     (presentation layer)
-├── model       (data transfer objects, business objects, errors and enums)
-└── repository  (data access layer)
-
-📝 The packages that are not a layer, are an extension of this pattern made by me based on my experience
+├── cmd            👉🏼 (executable commands)
+└── internal
+    ├── business   👉🏼 (business logic layer)
+    ├── dependency 👉🏼 (manage dependencies)
+    ├── handler    👉🏼 (presentation layer)
+    ├── model      👉🏼 (data transfer objects, business objects and enums)
+    └── repository 👉🏼 (data access layer)
 ```
-##### 1️⃣ Presentation layer
-Implements the program's user interface for interactions with its consumers.
-In the pattern's original form, this layer denotes a Graphical User Interface, such as a web interface or a desktop application.
 
-In modern systems, however, the presentation layer has a broader scope: that is, all means for triggering the program's behavior,
-both synchronous and asynchronous.
-For example:
-- Graphical user interface (GUI)
-- Command-line interface (CLI)
-- API for programmatic integration with other systems
-- Subscription to events in a message broker
-- Message topics for publishing outgoing events
-
-##### 2️⃣ Business logic layer
-This is the layer responsible for implementing and encapsulating the program's business logic
-
-##### 3️⃣ Data access layer 
-Provides access to persistence mechanisms.
-In the pattern's original form, this referred to the system's database. However, as in the case of the presentation layer,
-the layer's responsibility is broader for modern systems.
-
-<ol>
-    <li>
-        Ever since the NoSQL revolution broke out, it is common for a system to work with multiple databases.
-        <br>
-        For example, a document store can act as the operational database, a search index for dynamic queries, and in-memory database
-        for performance-optimized operations.
-        <br><br>
-    </li>
-    <li>
-        Traditional databases are not only medium for storing information.
-        <br>
-        For example, cloud-based object storage can be used to store the system's files, or a message bus can be used to orchestrate
-        communication between the program's different functions.
-        <br><br>
-    </li>
-    <li>
-        This layer also includes integration with the various external information providers needed to implement the program's functionality:
-        APIs provided by the external systems, or cloud vendor's managed services, such as language translation, stock market data, and
-        audio transcription
-    </li>
-</ol>
+[See more about layer architecture pattern](https://github.com/yael-castro/layered-architecture)
 
 ###### Communication between layers
+💥IMPORTANT💥 The layers are integrated in a top-down communication model: each layer can hold dependency only on the layer directly beneath it.
+<hr>
 
-The layers are integrated in a top-down communication model: each layer can hold dependency only on the layer directly beneath it.
+One way to communicate the layers to share data between it is to use `Domain Objects` to communicate the `Presentation Layer`
+with the `Business Layer` and `Data Transfer Objects` to communicate the `Business Layer` with the `Access Data Layer`
+
+```
+     
+    |--------------------|                      |----------------------|                             |-------------------|
+    | Presentation layer | ==[domain object]==> | Business logic layer | ==[data transfer object]==> | Data access layer |
+    |--------------------|                      |----------------------|                             |-------------------|
+
+```
+
+However, many times data transfer objects and domain objects are similar or identical, which lead to redundancy...
+To solve this problem I decided create the model package to be the way in that the three layers can be shared information
+using data types in common.
 
 ```
      
     |--------------------|           |----------------------|           |-------------------|
     | Presentation layer | ========> | Business logic layer | ========> | Data access layer |
     |--------------------|           |----------------------|           |-------------------|
-
+              ^                                 ^                                 ^
+              |                                 |                                 |
+              |=================================|=================================|
+                                                |
+                                     |----------------------|
+                                     |     Package model    |
+                                     |----------------------|
 ```
 <hr>
-<a href="https://www.flaticon.com/free-icons/stack" title="stack icons">Stack icons created by bukeicon - Flaticon</a>
