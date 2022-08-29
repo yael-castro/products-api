@@ -3,6 +3,9 @@ package handler
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/lib/pq"
+	error2 "github.com/yael-castro/agrak/internal/model/error"
+	"net/http"
 )
 
 // Handler defines the main handler that contains all *gin.HandlerFunc
@@ -53,4 +56,18 @@ func NewGinEngine(h Handler) *gin.Engine {
 	engine.DELETE("/products-api/v1/products/", h.DeleteProduct)
 
 	return engine
+}
+
+func handleError(c *gin.Context, err error) {
+	switch err.(type) {
+	case error2.Validation:
+		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
+	case error2.NotFound:
+		c.JSON(http.StatusNotFound, gin.H{"message": err.Error()})
+	case pq.Error:
+		// TODO: validate Postgres codes
+		c.JSON(http.StatusInternalServerError, gin.H{"message": "an unexpected error related to the storage occurs"})
+	default:
+		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
+	}
 }

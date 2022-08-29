@@ -35,6 +35,10 @@ type SKU string
 
 // IsValid check if the SKU are valid, if it does not valid returns an error
 func (s SKU) IsValid() error {
+	if s == "" {
+		return errors.New("SKU can not be blank")
+	}
+
 	if s == "" || !strings.HasPrefix(string(s), "FAL-") {
 		return errors.New("missing prefix 'FAL-'")
 	}

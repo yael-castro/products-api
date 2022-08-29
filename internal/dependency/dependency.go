@@ -3,9 +3,13 @@ package dependency
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"github.com/yael-castro/agrak/internal/business"
 	"github.com/yael-castro/agrak/internal/handler"
+	"github.com/yael-castro/agrak/internal/repository"
+	"os"
 )
 
 // Singleton instances
@@ -60,10 +64,26 @@ func handlerDefault(a any) error {
 		return fmt.Errorf(`an instance of "%T" is required not "%T"`, engine, a)
 	}
 
+	gormDSN := os.Getenv("GORM_DSN")
+	if gormDSN == "" {
+		return errors.New("missing environment variable GORM_DSN")
+	}
+
+	db, err := repository.NewGormDB(gormDSN)
+	if err != nil {
+		return err
+	}
+
 	handlers := handler.GinHandlers{}
 
 	handlers.SetHealthCheck(handler.HealthCheck)
-	handlers.ProductManager = handler.ProductStore{}
+	handlers.ProductManager = handler.ProductStore{
+		ProductManager: business.ProductStore{
+			StorageManager: repository.ProductStore{
+				DB: db,
+			},
+		},
+	}
 
 	*engine = *handler.NewGinEngine(handlers)
 	return nil
