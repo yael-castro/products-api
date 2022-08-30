@@ -2,7 +2,7 @@
 package business
 
 import (
-	"github.com/yael-castro/agrak/internal/model"
+	"github.com/yael-castro/products-api/internal/model"
 )
 
 // ProductManager defines the common actions for product manager

@@ -5,9 +5,9 @@ import (
 	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"github.com/yael-castro/agrak/internal/business"
-	"github.com/yael-castro/agrak/internal/handler"
-	"github.com/yael-castro/agrak/internal/repository"
+	"github.com/yael-castro/products-api/internal/business"
+	"github.com/yael-castro/products-api/internal/handler"
+	"github.com/yael-castro/products-api/internal/repository"
 	"os"
 )
 

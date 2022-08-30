@@ -2,8 +2,8 @@ package repository
 
 import (
 	"fmt"
-	"github.com/yael-castro/agrak/internal/model"
-	error2 "github.com/yael-castro/agrak/internal/model/error"
+	"github.com/yael-castro/products-api/internal/model"
+	error2 "github.com/yael-castro/products-api/internal/model/error"
 	"gorm.io/gorm"
 )
 

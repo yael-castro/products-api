@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/gin-gonic/gin"
-	error2 "github.com/yael-castro/agrak/internal/model/error"
+	error2 "github.com/yael-castro/products-api/internal/model/error"
 	"log"
 	"net/http"
 )

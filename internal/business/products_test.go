@@ -2,9 +2,9 @@ package business
 
 import (
 	"errors"
-	"github.com/yael-castro/agrak/internal/model"
-	error2 "github.com/yael-castro/agrak/internal/model/error"
-	"github.com/yael-castro/agrak/internal/repository"
+	"github.com/yael-castro/products-api/internal/model"
+	error2 "github.com/yael-castro/products-api/internal/model/error"
+	"github.com/yael-castro/products-api/internal/repository"
 	"net/url"
 	"reflect"
 	"strconv"

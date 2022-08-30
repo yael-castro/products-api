@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/yael-castro/agrak/internal/model"
-	"github.com/yael-castro/agrak/internal/repository"
+	"github.com/yael-castro/products-api/internal/model"
+	"github.com/yael-castro/products-api/internal/repository"
 	"log"
 	"os"
 )

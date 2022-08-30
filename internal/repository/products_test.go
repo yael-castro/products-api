@@ -3,8 +3,8 @@ package repository
 import (
 	"errors"
 	"flag"
-	"github.com/yael-castro/agrak/internal/model"
-	error2 "github.com/yael-castro/agrak/internal/model/error"
+	"github.com/yael-castro/products-api/internal/model"
+	error2 "github.com/yael-castro/products-api/internal/model/error"
 	"log"
 	"net/url"
 	"os"

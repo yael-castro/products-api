@@ -1,4 +1,4 @@
-module github.com/yael-castro/agrak
+module github.com/yael-castro/products-api
 
 go 1.19
 

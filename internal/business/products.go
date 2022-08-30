@@ -1,14 +1,15 @@
 package business
 
 import (
-	"github.com/yael-castro/agrak/internal/model"
-	error2 "github.com/yael-castro/agrak/internal/model/error"
-	"github.com/yael-castro/agrak/internal/repository"
+	"github.com/yael-castro/products-api/internal/model"
+	error2 "github.com/yael-castro/products-api/internal/model/error"
+	"github.com/yael-castro/products-api/internal/repository"
 )
 
 // _ "implements" constraint for ProductStore
 var _ ProductManager = ProductStore{}
 
+// ProductStore manage the products management
 type ProductStore struct {
 	repository.StorageManager[model.SKU, model.Product]
 }
@@ -59,6 +60,7 @@ func (s ProductStore) CreateProduct(product *model.Product) error {
 	return s.Create(product)
 }
 
+// ObtainProduct if the model.SKU received as parameter is valid, search into storage a record identifier by the model.SKU
 func (s ProductStore) ObtainProduct(sku model.SKU) (model.Product, error) {
 	if err := sku.IsValid(); err != nil {
 		return model.Product{}, error2.Validation(err.Error())
@@ -85,6 +87,7 @@ func (s ProductStore) DeleteProduct(sku model.SKU) error {
 	return s.Delete(sku)
 }
 
+// ListProducts returns all records of model.Product from the storage
 func (s ProductStore) ListProducts() (model.Products, error) {
 	return s.List()
 }

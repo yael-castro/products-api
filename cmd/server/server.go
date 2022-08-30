@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/yael-castro/agrak/internal/dependency"
+	"github.com/yael-castro/products-api/internal/dependency"
 )
 
 const defaultPort = "8080"

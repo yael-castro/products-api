@@ -2,14 +2,15 @@ package handler
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/yael-castro/agrak/internal/business"
-	"github.com/yael-castro/agrak/internal/model"
+	"github.com/yael-castro/products-api/internal/business"
+	"github.com/yael-castro/products-api/internal/model"
 	"net/http"
 )
 
 // _ "implements" constraint for ProductStore
 var _ ProductManager = ProductStore{}
 
+// ProductStore contains the group of gin.HandlerFunc for handle requests related to
 type ProductStore struct {
 	business.ProductManager
 }
