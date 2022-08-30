@@ -65,7 +65,7 @@ func (p ProductStore) UpdateProduct(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusCreated, product)
+	c.JSON(http.StatusOK, product)
 }
 
 // DeleteProduct gin.HandlerFunc to handle http requests made to remove a product from the storage
