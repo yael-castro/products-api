@@ -23,13 +23,13 @@ func main() {
 		gin.SetMode(gin.TestMode)
 	}
 
-	engine := &gin.Engine{}
+	var h http.Handler
 
-	err := dependency.NewInjector(dependency.Default).Inject(engine)
+	err := dependency.NewInjector(dependency.Default).Inject(&h)
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	log.Printf(`http server is running on port "%v" %v`, port, "🤘\n")
-	log.Fatal(http.ListenAndServe(":"+port, engine))
+	log.Fatal(http.ListenAndServe(":"+port, h))
 }

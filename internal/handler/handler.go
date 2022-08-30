@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"github.com/rs/cors"
 	error2 "github.com/yael-castro/products-api/internal/model/error"
 	"net/http"
 )
@@ -28,18 +29,16 @@ type ProductManager interface {
 	ObtainProducts(*gin.Context)
 }
 
-// _ "implements" constraint for GinHandlers
-var _ Handler = GinHandlers{}
+// _ "implements" constraint for Groups
+var _ Handler = Groups{}
 
-// GinHandlers is the collection of all *gin.HandlerFunc used to initialize the *gin.Engine
-//
-// In resume is the configuration to initialize the *gin.Engine
-type GinHandlers struct {
+// Groups is the collection of all *gin.HandlerFunc used to initialize the *gin.Engine
+type Groups struct {
 	ProductManager
 }
 
-// NewGinEngine using an instance of Handler initializes the *gin.Engine
-func NewGinEngine(h Handler) *gin.Engine {
+// NewHttpHandler using an instance of Handler initializes the *gin.Engine
+func NewHttpHandler(h Handler) http.Handler {
 	engine := gin.Default()
 
 	// Default handlers
@@ -55,7 +54,7 @@ func NewGinEngine(h Handler) *gin.Engine {
 
 	engine.DELETE("/v1/products/:id", h.DeleteProduct)
 
-	return engine
+	return cors.AllowAll().Handler(engine)
 }
 
 // HealthCheck is the default *gin.HandlerFunc used to know the health server and monitoring the server status
@@ -65,33 +64,33 @@ func HealthCheck(c *gin.Context) {
 
 // NotFound is the default *gin.HandlerFunc used to handle http requests made to non exist paths
 func NotFound(c *gin.Context) {
-	c.JSON(http.StatusNotFound, gin.H{"message": fmt.Sprintf(`path '%s' does not exist`, c.Request.URL.Path)})
+	c.JSON(http.StatusNotFound, gin.H{"error": fmt.Sprintf(`path '%s' does not exist`, c.Request.URL.Path)})
 }
 
 // handleError handles errors and related it to http response codes
 func handleError(c *gin.Context, err error) {
 	switch err.(type) {
 	case error2.Validation:
-		c.JSON(http.StatusBadRequest, gin.H{"message": err})
+		c.JSON(http.StatusBadRequest, gin.H{"error": err})
 
 	case error2.NotFound:
-		c.JSON(http.StatusNotFound, gin.H{"message": err})
+		c.JSON(http.StatusNotFound, gin.H{"error": err})
 
 	case *json.MarshalerError:
-		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 
 	case *json.SyntaxError:
-		c.JSON(http.StatusUnprocessableEntity, gin.H{"message": err.Error()})
+		c.JSON(http.StatusUnprocessableEntity, gin.H{"error": err.Error()})
 
 	case *error2.PG:
 		switch err.(*error2.PG).Code {
 		case "23505":
-			c.JSON(http.StatusConflict, gin.H{"message": "duplicated record"})
+			c.JSON(http.StatusConflict, gin.H{"error": "duplicated record"})
 		default:
-			c.JSON(http.StatusInternalServerError, gin.H{"message": "an unexpected error related to storage occurred"})
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "an unexpected error related to storage occurred"})
 		}
 
 	default:
-		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 	}
 }

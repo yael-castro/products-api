@@ -1,0 +1,188 @@
+openapi: 3.0.0
+servers: 
+  - url: 'http://localhost:8080'
+info:
+  description: 'REST API for product storage management'
+  version: "1.0.0"
+  title: 'Products API'
+  contact:
+    email: 'yy.lgnd@gmail.com'
+paths:
+  /v1/products/{id}:
+    get:
+      tags:
+        - products
+      summary: 'Search a product by their identifier'
+      operationId: searchProduct
+      description: 'Search a product by their identifier'
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+      responses:
+        '200':
+          description: 'OK'
+          content:
+            application/json:
+              schema:
+                  $ref: '#/components/schemas/Product'
+        '404':
+          description: 'Product does not exist'
+          content:
+            application/json:
+              schema:
+                  $ref: '#/components/schemas/Error'
+    delete:
+      tags:
+        - products
+      summary: 'Delete product'
+      operationId: deleteProduct
+      description: 'Removes a product from the storage'
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+          required: true
+      responses: 
+        '200':
+          description: 'Success'
+          content:
+            application/json:
+              schema: 
+               $ref: '#/components/schemas/Message'
+        '400':
+          description: 'Invalid product sku'
+          content:
+            application/json:
+              schema: 
+               $ref: '#/components/schemas/Error'
+        '404':
+          description: 'Product does not exist'
+          content:
+            application/json:
+              schema: 
+               $ref: '#/components/schemas/Error'
+  /v1/products:
+    get:
+      tags:
+        - products
+      summary: 'List all products'
+      operationId: searchProducts
+      description: 'List all products from the storage'
+      responses:
+        '200':
+          description: 'OK'
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Product'
+    post:
+      tags:
+        - products
+      summary: 'Add a new product'
+      operationId: addProduct
+      description: 'Add a new product to the storage'
+      responses:
+        '201':
+          description: 'Created product'
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/Product'
+        '400':
+          description: 'Invalid product data'
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/Error'
+        '409':
+          description: 'Duplicated record'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Product'
+        description: 'Product data'
+    put:
+      tags:
+        - products
+      summary: 'Update product'
+      operationId: updateProduct
+      description: 'Update an existing product'
+      responses:
+        '200':
+          description: 'Product updated'
+          content: 
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/Product'
+        '400':
+          description: 'Invalid product data'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Product'
+        description: 'Product data'          
+components:
+  schemas:
+    Message:
+      type: object
+      properties:
+        message:
+          type: string
+          example: "OK"
+    Error:
+      type: object
+      properties:
+        error: 
+          type: string
+          example: "unexpected error"
+    Product:
+      type: object
+      required:
+        - sku
+        - name
+        - brand
+        - price
+        - principalImage
+      properties:
+        sku:
+          type: string
+          example: "FAL-12345678"
+          pattern: '^FAL-[0-9]+$'
+        name:
+          type: string
+          example: 'Shoes'
+        brand:
+          type: string
+          example: 'Nike'
+        size:
+          type: string
+          example: 'M'
+        price:
+          type: number
+          example: 10.5
+        principalImage:
+          type: string
+          example: 'https://example.com'
+        otherImages:
+          type: array
+          items: 
+            type: string
+          example: 
+            - 'https://a.example.com'
+            - 'https://b.example.com'

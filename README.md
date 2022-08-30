@@ -3,7 +3,8 @@
 REST API for product storage management
 ###### Quick Links
 - [Required environment variables](.env.example)
-- [API documentation](https://documenter.getpostman.com/view/12474312/VUxLvTJR)
+- [API documentation (Swagger)](swagger.yaml)
+- [API documentation (Postman)](https://documenter.getpostman.com/view/12474312/VUxLvTJR)
 
 ###### How to run (Golang)
 ```shell
@@ -18,9 +19,18 @@ go run ./cmd/server/server.go
 ###### Unit tests
 #### Structure
 ```go
+package foo
+
+import (
+	"strconv"
+	"testing"
+)
+
 func TestX(t *testing.T) {
 	// Table Driven Testing 
-	tdt := []struct{}{}
+	tdt := []struct{}{
+	    {},	// Test Case
+    }
 	
 	// Setup
 	x := struct{}{}
@@ -29,9 +39,10 @@ func TestX(t *testing.T) {
 	t.Cleanup(func() {})
 	
 	// Subtests 
-	for v, i := range tdt {
-		// Cleanup function for each subtest (Optional)
+	for i, v := range tdt {
 		t.Run(strconv.Itoa(i), func(t *testing.T){
+			t.Log(x, v)
+			// Cleanup function for each subtest (Optional)
 			t.Cleanup(func() {})
 		})
 	}

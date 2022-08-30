@@ -4,10 +4,10 @@ package dependency
 import (
 	"errors"
 	"fmt"
-	"github.com/gin-gonic/gin"
 	"github.com/yael-castro/products-api/internal/business"
 	"github.com/yael-castro/products-api/internal/handler"
 	"github.com/yael-castro/products-api/internal/repository"
+	"net/http"
 	"os"
 )
 
@@ -50,11 +50,11 @@ func NewInjector(p Profile) Injector {
 	panic(fmt.Sprintf(`invalid profile: "%d" is not supported`, p))
 }
 
-// handlerDefault InjectorFunc for *handler.GinHandlers that uses a Default Profile
+// handlerDefault InjectorFunc for *handler.Groups that uses a Default Profile
 func handlerDefault(a any) error {
-	engine, ok := a.(*gin.Engine)
+	h, ok := a.(*http.Handler)
 	if !ok {
-		return fmt.Errorf(`an instance of "%T" is required not "%T"`, engine, a)
+		return fmt.Errorf(`an instance of "%T" is required not "%T"`, h, a)
 	}
 
 	gormDSN := os.Getenv("GORM_DSN")
@@ -67,9 +67,9 @@ func handlerDefault(a any) error {
 		return err
 	}
 
-	handlers := handler.GinHandlers{}
+	groups := handler.Groups{}
 
-	handlers.ProductManager = handler.ProductStore{
+	groups.ProductManager = handler.ProductStore{
 		ProductManager: business.ProductStore{
 			StorageManager: repository.ProductStore{
 				DB: db,
@@ -77,6 +77,6 @@ func handlerDefault(a any) error {
 		},
 	}
 
-	*engine = *handler.NewGinEngine(handlers)
+	*h = handler.NewHttpHandler(groups)
 	return nil
 }
