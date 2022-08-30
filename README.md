@@ -15,6 +15,30 @@ go run ./cmd/migrations/migrations.go
 go run ./cmd/server/server.go
 ```
 
+###### Unit tests
+#### Structure
+```go
+func TestX(t *testing.T) {
+	// Table Driven Testing 
+	tdt := []struct{}{}
+	
+	// Setup
+	x := struct{}{}
+	
+	// Cleanup function (Optional)
+	t.Cleanup(func() {})
+	
+	// Subtests 
+	for v, i := range tdt {
+		// Cleanup function for each subtest (Optional)
+		t.Run(strconv.Itoa(i), func(t *testing.T){
+			t.Cleanup(func() {})
+		})
+	}
+}
+```
+#### Notes
+- Added custom cli flags to modify unit test behavior (for example, if the -V flag is used when running unit tests, additional logs are displayed)
 ###### Architecture style explained
 The architecture pattern used in this project is the most common form of layered architecture pattern 
 with three layers (presentation, business, and data access) and some additional changes about
