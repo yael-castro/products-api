@@ -14,8 +14,8 @@ type ProductStore struct {
 	repository.StorageManager[model.SKU, model.Product]
 }
 
-// productIsValid validates if the model.Product received is valid, if the model.Product is not valid returns an error
-func (s ProductStore) productIsValid(product model.Product) error {
+// validateProductData validates if the model.Product received is valid, if the model.Product is not valid returns an error
+func (s ProductStore) validateProductData(product model.Product) error {
 	if err := product.SKU.IsValid(); err != nil {
 		return error2.Validation(err.Error())
 	}
@@ -52,7 +52,7 @@ func (s ProductStore) productIsValid(product model.Product) error {
 
 // CreateProduct validates the model.Product and if it is valid, a record is created in the storage
 func (s ProductStore) CreateProduct(product *model.Product) error {
-	err := s.productIsValid(*product)
+	err := s.validateProductData(*product)
 	if err != nil {
 		return err
 	}
@@ -61,6 +61,8 @@ func (s ProductStore) CreateProduct(product *model.Product) error {
 }
 
 // ObtainProduct if the model.SKU received as parameter is valid, search into storage a record identifier by the model.SKU
+//
+// The model.SKU is validated before to search the model.Product into storage to avoid
 func (s ProductStore) ObtainProduct(sku model.SKU) (model.Product, error) {
 	if err := sku.IsValid(); err != nil {
 		return model.Product{}, error2.Validation(err.Error())
@@ -69,8 +71,11 @@ func (s ProductStore) ObtainProduct(sku model.SKU) (model.Product, error) {
 	return s.Obtain(sku)
 }
 
+// UpdateProduct updates the record of model.Product identified by the model.SKU
+//
+// The model.SKU is validated before updating the record to avoid unnecessary and wasted requests to storage
 func (s ProductStore) UpdateProduct(product model.Product) error {
-	err := s.productIsValid(product)
+	err := s.validateProductData(product)
 	if err != nil {
 		return err
 	}
@@ -78,7 +83,9 @@ func (s ProductStore) UpdateProduct(product model.Product) error {
 	return s.Update(product.SKU, product)
 }
 
-// DeleteProduct deletes the record of model.Product identified by the model.SKU receive
+// DeleteProduct deletes the record of model.Product identified by the model.SKU received
+//
+// The model.SKU is validated before de-registration to avoid unnecessary and wasted storage requests
 func (s ProductStore) DeleteProduct(sku model.SKU) error {
 	if err := sku.IsValid(); err != nil {
 		return error2.Validation(err.Error())

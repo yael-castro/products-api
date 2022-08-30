@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	error2 "github.com/yael-castro/products-api/internal/model/error"
-	"log"
 	"net/http"
 )
 
@@ -39,16 +38,6 @@ type GinHandlers struct {
 	ProductManager
 }
 
-// HealthCheck is the default *gin.HandlerFunc used to know the health server and monitoring the server status
-func HealthCheck(c *gin.Context) {
-	_, _ = c.Writer.Write(nil)
-}
-
-// NotFound is the default *gin.HandlerFunc used to handle http requests made to non exist paths
-func NotFound(c *gin.Context) {
-	c.JSON(http.StatusNotFound, gin.H{"message": fmt.Sprintf(`path '%s' does not exist`, c.Request.URL.Path)})
-}
-
 // NewGinEngine using an instance of Handler initializes the *gin.Engine
 func NewGinEngine(h Handler) *gin.Engine {
 	engine := gin.Default()
@@ -69,6 +58,16 @@ func NewGinEngine(h Handler) *gin.Engine {
 	return engine
 }
 
+// HealthCheck is the default *gin.HandlerFunc used to know the health server and monitoring the server status
+func HealthCheck(c *gin.Context) {
+	_, _ = c.Writer.Write(nil)
+}
+
+// NotFound is the default *gin.HandlerFunc used to handle http requests made to non exist paths
+func NotFound(c *gin.Context) {
+	c.JSON(http.StatusNotFound, gin.H{"message": fmt.Sprintf(`path '%s' does not exist`, c.Request.URL.Path)})
+}
+
 // handleError handles errors and related it to http response codes
 func handleError(c *gin.Context, err error) {
 	switch err.(type) {
@@ -82,7 +81,7 @@ func handleError(c *gin.Context, err error) {
 		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 
 	case *json.SyntaxError:
-		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
+		c.JSON(http.StatusUnprocessableEntity, gin.H{"message": err.Error()})
 
 	case *error2.PG:
 		switch err.(*error2.PG).Code {
@@ -95,6 +94,4 @@ func handleError(c *gin.Context, err error) {
 	default:
 		c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
 	}
-
-	log.Printf("ERROR: %T\n", err)
 }
